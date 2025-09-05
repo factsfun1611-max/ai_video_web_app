@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>AI Video Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; max-width: 900px; }
+    h1 { margin-bottom: 8px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+    label { font-weight: 600; display: block; margin: 10px 0 6px; }
+    textarea, input, select {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;
+      font-size: 15px;
+    }
+    button {
+      background: #111; color: #fff; border: none; padding: 12px 18px; border-radius: 10px;
+      font-size: 16px; cursor: pointer; margin-top: 12px;
+    }
+    button:hover { opacity: 0.9; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 700px) { .row { grid-template-columns: 1fr; } }
+    .hint { color: #666; font-size: 13px; }
+    video { width: 100%; border-radius: 12px; margin-top: 8px; }
+    .error { background: #ffe6e6; color: #900; padding: 10px; border-radius: 8px; }
+    .ok { background: #eefaf0; color: #065; padding: 10px; border-radius: 8px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+  </style>
+</head>
+<body>
+  <h1>AI Video Generator</h1>
+  <p class="hint">Paste your script or enter a topic. Choose layout (YouTube or Shorts), optional music, and generate.</p>
+
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+
+  <form class="card" method="post">
+    <div class="row">
+      <div>
+        <label>Mode</label>
+        <select name="mode">
+          <option value="script">Use my script</option>
+          <option value="topic">I’ll type only a topic (auto-build simple script)</option>
+        </select>
+      </div>
+      <div>
+        <label>Layout</label>
+        <select name="layout">
+          <option value="landscape">YouTube (1280×720)</option>
+          <option value="vertical">Shorts (1080×1920)</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Topic (optional if using your own script)</label>
+    <input name="topic" placeholder="e.g., Benefits of Green Tea" />
+
+    <label>Your Script</label>
+    <textarea name="script" rows="10" placeholder="Paste your full script here (no length limit)."></textarea>
+    <div class="hint">Tip: Break sections with blank lines to create clearer scenes.</div>
+
+    <div class="row">
+      <div>
+        <label>Voice Speed (0.8–1.2)</label>
+        <input type="number" step="0.05" min="0.6" max="1.5" name="voice_speed" value="1.0"/>
+        <div class="hint">1.0 = normal, 0.9 = calmer, 1.1 = faster</div>
+      </div>
+      <div>
+        <label>Background Music URL (optional)</label>
+        <input name="music_url" placeholder="https://example.com/your-music.mp3"/>
+        <div class="hint">Use a direct .mp3 URL (royalty-free). Mixed at low volume.</div>
+      </div>
+    </div>
+
+    <button type="submit">Generate Video</button>
+  </form>
+
+  {% if video_url %}
+    <div class="card ok">
+      <strong>Video ready!</strong>
+      <video controls>
+        <source src="{{ video_url }}" type="video/mp4">
+      </video>
+      <p><a class="mono" href="{{ video_url }}" download>⬇ Download Video</a></p>
+    </div>
+
+    <div class="card">
+      <label>Final Script (copy/save)</label>
+      <textarea rows="10">{{ final_script }}</textarea>
+    </div>
+  {% endif %}
+</body>
+</html>
+
